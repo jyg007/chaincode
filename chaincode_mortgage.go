@@ -1061,37 +1061,29 @@ func getMortgageDoc(state map[string]interface{}, docId string, role string) (ma
 	return doc, form, rights, nil
 }
 
-//func (t *SimpleChaincode) Run(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	// Handle different functions
-//	if function == "init" {
-//		return t.Init(stub, function, args)
-//	} else if function == "invoke" {
-//		return t.Invoke(stub, function, args)
-//	}
 
-//	return nil, errors.New("Received unknown function invocation")
-//}
 
 func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
-        _, args := stub.GetFunctionAndParameters()
+       var res []byte
+       var err error
+  
+        function , args := stub.GetFunctionAndParameters()
 	
-	res,err := t.setMortgageDoc(stub, args)
+	fmt.Printf("invoke\n")
+
+	if function == "invoke" {
+	    res,err = t.setMortgageDoc(stub, args)
+	} else {
+	    res,err = t.getMortgageState(stub, args)
+	}
+	
 	if err == nil {
 	    return shim.Success(res)
 	} else {
-	    return shim.Error(string(res))	  
+	    return shim.Success(res)	  
 	}
 }
 
-func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface)  pb.Response {
-        _, args := stub.GetFunctionAndParameters()
-	res,err := t.getMortgageState(stub, args)
-	if err == nil {
-	    return shim.Success(res)
-	} else {
-	    return shim.Error(string(res))	  
-	}
-}
 
 func main() {
 	err := shim.Start(new(SimpleChaincode))
